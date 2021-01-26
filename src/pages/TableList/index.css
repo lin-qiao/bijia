@@ -1,0 +1,7 @@
+  // 被选中的表格行的样式
+.clickRowStyl{
+	background-color:#00b4ed
+}
+.ant-table-tbody>.clickRowStyl:hover>td{
+	background-color:#00b4ed
+}
