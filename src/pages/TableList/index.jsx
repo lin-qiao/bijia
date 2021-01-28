@@ -1,10 +1,27 @@
-import { message, Image } from 'antd';
+import { message, Image, Select } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import {  ProFormSelect } from '@ant-design/pro-form';
 import React, { useState, useEffect } from 'react';
-import { getList,getDetail, getPrice, searchList } from './service';
+import { getList, getCategory, getDetail, getPrice, searchList } from './service';
 import './index.css'
+const MySelect = ({brandId, value, onChange}) => {
+	const [options, setOptions] = useState([]);
+	useEffect(() => {
+		getCategory({
+			brandId
+		}).then(res => {
+			const list = res.data.map(item => ({
+				label: item.name,
+				value: item.id
+			}))
+			setOptions(list)
+		})
+	}, [brandId])
+	return (
+		<Select options={options} value={value} onChange={onChange} />
+	)
+}
 const TableList = () => {
     const [rowId, setRowId] = useState(null);
 	const [sorters, setSorters] = useState('{}');
@@ -21,40 +38,52 @@ const TableList = () => {
 	  }
 	  
   const columns = [
-	{
-		title: '关键字',
-		dataIndex: 'keyword',
-		initialValue: '耐克 运动休闲鞋',
-		valueType: 'text',
-		hideInTable: true,
-	},
-	 {
-	    title: '状态',
-	    dataIndex: 'fieldName',
-	    initialValue: 'SALES',
+	  {
+	    title: '专场',
+	    dataIndex: 'brandId',
+		initialValue: '100786243',
 	    valueType: 'select',
 	    valueEnum: {
-	      PRICE: { text: '价格', status: 'PRICE' },
-	      DISCOUNT: { text: '折扣', status: 'DISCOUNT'},
-	      SALES: { text: '销量', status: 'SALES'},
+	      100786243: { text: '耐克', status: '100786243' },
+	      100722917: { text: '彪马', status: '100722917' },
+	      100908165: { text: '安踏', status: '100908165' },
+	      100926957: { text: '匡威', status: '100926957' },
+	      100926915: { text: '阿迪', status: '100926915' },
+	      100926931: { text: '李宁', status: '100926931' },
 	    },
 		hideInTable: true
 	  },
-	  
+	  {
+	  	title: '分类',
+	  	dataIndex: 'categoryId',
+	  	hideInTable: true,
+		renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+			const brandId = form.getFieldValue('brandId');
+			if (!brandId) {
+			  return null;
+			}
+			return (
+			  <MySelect
+				{...rest}
+				brandId={brandId}
+			  />
+			);
+		  },
+	  },
 	  
     {
       title: '商品名称',
+			dataIndex: 'title',
       valueType: 'text',
-	  render: (_, record) => `${record.brandName} | ${record.goodsName}`,
-	  hideInSearch: true,
-	  ellipsis: true,
-	  width:200,
+			hideInSearch: true,
+			ellipsis: true,
+			width:200,
     },
 	{
 	  title: '商品主图',
-	  dataIndex: 'goodsMainPicture',
+	  dataIndex: 'smallImage',
 	  valueType: 'text',
-	  render:(_, record) => <Image width={50} src={record.goodsMainPicture}/>,
+	  render:(_, record) => <Image width={50} src={record.smallImage}/>,
 	  hideInSearch: true
 	},
 	{
@@ -65,27 +94,15 @@ const TableList = () => {
 	  hideInSearch: true
 	},
 	{
-	  title: '商品类别',
-	  dataIndex: 'cat2ndName',
-	  valueType: 'text',
-	  hideInSearch: true
-	},
-	{
 	   title: '库存',
-	   dataIndex: 'saleStockStatus',
-	   valueType: 'select',
-	   valueEnum: {
-	     1: { text: '已抢光', status: '1'},
-	     2: { text: '有库存', status: '2'},
-	     3: { text: '有机会,', status: '3'},
-	   },
+	   render: (_, record) => record?.stockLabel?.value,
 	   hideInSearch: true
 	 },
 	{
 	  title: '唯品会价格',
-	  dataIndex: 'vipPrice',
 	  valueType: 'text',
-	  hideInSearch: true
+	  hideInSearch: true,
+	  render: (_, record) => record?.price?.salePrice,
 	},
 	{
 	  title: '得物名称',
@@ -129,26 +146,13 @@ const TableList = () => {
 	  sorter: (a, b) => a.chajia - b.chajia,
 	  hideInSearch: true
 	},
-	{
-	  title: '折扣',
-	  dataIndex: 'discount',
-	  valueType: 'text',
-	  hideInSearch: true
-	},
-	
-	{
-	  title: '店铺',
-	  valueType: 'text',
-	  render: (_, record) => record.storeInfo.storeName,
-	  hideInSearch: true
-	},
     {
       title: '',
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
-		  <a href={record.destUrl} target="_black">唯品会查看</a>,
-		  <a href={`https://m.poizon.com/router/product/ProductDetail?spuId=${record.productId}&sourceName=shareDetail`} target="_black">得物查看</a>
+		  <a href={`https://m.vip.com/product-${record.brandId}-${record.productId}.html`} target="_black">唯品会查看</a>,
+		  <a href={`https://m.poizon.com/router/product/ProductDetail?spuId=${record.dewuProductId}&sourceName=shareDetail`} target="_black">得物查看</a>
       ],
 	  hideInSearch: true
     },
@@ -163,35 +167,14 @@ const TableList = () => {
 	 return data?.product?.merchandiseSn
   } 
   
-  const getPrices = async(code, goodsId) => {
-  	 const {data} = await getPrice({
-  		 api_key: "8cec5243ade04ed3a02c5972bcda0d3f",
-  		 brandid: code,
-  		 couponInfoVer: "2",
-  		 freightTipsVer: "3",
-  		 isUseMultiColor: "1",
-  		 mid: goodsId,
-  		 mvip: "true",
-		 functions: "midSupportServices%2CuserContext%2CbuyLimit%2CforeShowActive%2CpanelView%2CfuturePriceView%2CshowSingleColor%2CnoProps%2Csku_price%2Cactive_price%2Cprepay_sku_price%2Creduced_point_desc%2CsurprisePrice%2CbusinessCode%2CpromotionTips%2Cinvisible%2Cflash_sale_stock%2CrestrictTips%2CfavStatus%2CbanInfo%2CfuturePrice%2CpriceChart%2CpriceView%2CquotaInfo%2CexclusivePrice%2CextraDetailImages",
-  		 prepayMsgType: "1",
-  		 priceViewVer: "8",
-  		 promotionTipsVer: "5",
-  		 salePriceTypeVer: "2",
-  		 serviceTagVer: "1",
-  		 supportAllPreheatTipsTypes: "1",
-  		 supportSquare: "1",
-  		 wap_consumer: "C2-1",
-  		 warehouse: "VIP_SH",
-  	 });
-  	 return data?.product_price_range_mapping[goodsId]?.priceView?.finalPrice?.price
-  } 
-  
-  
   return (
     <PageContainer>
       <ProTable
         headerTitle="唯品会商品列表"
         rowKey="goodsId"
+		pagination={{
+			pageSize: 80,
+		}}
         search={{
           labelWidth: 120,
         }}
@@ -206,27 +189,25 @@ const TableList = () => {
 			};
 			
 			const res = await getList({
-				...params,
-				apikey: 'SROX6xv7CUxLQQ0HUg9RjhV4lQace290',
-				queryStock: true,
+				brandId: params.brandId,
 				page: params.current,
-				pageSize: params.pageSize,
+				categoryId: params.categoryId
+				
 			})
 			for(const obj of res.data){
-				obj.goodsCode = await getCode(obj.goodsId)
-				obj.vipPrice = await getPrices(obj.brandId, obj.goodsId)
+				obj.goodsCode = await getCode(obj.productId)
 				const res = await searchList(obj.goodsCode)
 				const detail = res?.data?.productList?.length? res?.data?.productList[0] : null;
 				obj.dewuPrice = detail? (detail.price / 100).toFixed(2) : null;
 				obj.soldNum = detail? detail.soldNum : null;
-				obj.productId = detail? detail.productId : null;
-				obj.chajia = detail? (parseInt(obj.dewuPrice) - parseInt(obj.vipPrice)).toFixed(2) : null;
+				obj.dewuProductId = detail? detail.productId : null;
+				obj.chajia = detail? (parseInt(obj.dewuPrice) - parseInt(obj.price.salePrice)).toFixed(2) : null;
 				obj.dewuDetail = detail;
 			}
 			return {
 			   data: res.data,
 			   success: true,
-			   total: res.total_results,
+			   total: res.total,
 			}
 		}}
         columns={columns}

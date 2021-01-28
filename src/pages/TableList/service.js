@@ -2,8 +2,14 @@ import request from '@/utils/request'
 import getQueryStr from "@/util/getQuery";
 import sign from "@/util/sign";
 export async function getList(params) {
-  return request('/vip/query', {
-    params
+  return request('/myApi/getList', {
+	params
+  });
+}
+
+export async function getCategory(params) {
+  return request('/myApi/getCategoryList', {
+	params
   });
 }
 

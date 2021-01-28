@@ -7,6 +7,13 @@
  */
 export default {
 	dev: {
+		'/myApi/': {
+			target: 'http://localhost:3000',
+			changeOrigin: true,
+			pathRewrite: {
+				'^': '',
+			},
+		},
 		'/vip/': {
 			target: 'http://api.tbk.dingdanxia.com',
 			changeOrigin: true,
