@@ -41,7 +41,7 @@ router.get('/myApi/getList', async (ctx, next) => {
 			'mobile_channel': 'mobiles-%7C%7C',
 			'standby_id': 'nature',
 			'brandId': brandId || 100786243,
-			'sort': 0,
+			'sort': 6,
 			categoryId,
 			'fromIndex': fromIndex,
 			'abtestId': 13100000,
