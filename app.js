@@ -8,7 +8,7 @@ const logger = require('koa-logger')
 
 const index = require('./routes/index')
 const users = require('./routes/users')
-
+require('./schedule')
 // error handler
 onerror(app)
 
@@ -20,9 +20,9 @@ app.use(json())
 app.use(logger())
 app.use(require('koa-static')(__dirname + '/public'))
 
-app.use(views(__dirname + '/views', {
-  extension: 'pug'
-}))
+// app.use(views(__dirname + '/views', {
+//   extension: 'pug'
+// }))
 
 // logger
 app.use(async (ctx, next) => {
