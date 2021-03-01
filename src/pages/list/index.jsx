@@ -3,25 +3,8 @@ import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import {  ProFormSelect } from '@ant-design/pro-form';
 import React, { useState, useEffect } from 'react';
-import { getList, getCategory, getDetail, getPrice, searchList } from './service';
+import { getList } from './service';
 import './index.css'
-const MySelect = ({brandId, value, onChange}) => {
-	const [options, setOptions] = useState([]);
-	useEffect(() => {
-		getCategory({
-			brandId
-		}).then(res => {
-			const list = res.data.map(item => ({
-				label: item.name,
-				value: item.id
-			}))
-			setOptions(list)
-		})
-	}, [brandId])
-	return (
-		<Select options={options} value={value} onChange={onChange} />
-	)
-}
 const TableList = () => {
     const [rowId, setRowId] = useState(null);
 	const [sorters, setSorters] = useState('{}');
@@ -53,27 +36,10 @@ const TableList = () => {
 	    },
 		hideInTable: true
 	  },
-	  {
-	  	title: '分类',
-	  	dataIndex: 'categoryId',
-	  	hideInTable: true,
-		renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-			const brandId = form.getFieldValue('brandId');
-			if (!brandId) {
-			  return null;
-			}
-			return (
-			  <MySelect
-				{...rest}
-				brandId={brandId}
-			  />
-			);
-		  },
-	  },
 	  
     {
       title: '商品名称',
-			dataIndex: 'title',
+			dataIndex: 'goods_name',
       valueType: 'text',
 			hideInSearch: true,
 			ellipsis: true,
@@ -81,69 +47,69 @@ const TableList = () => {
     },
 	{
 	  title: '商品主图',
-	  dataIndex: 'smallImage',
 	  valueType: 'text',
-	  render:(_, record) => <Image width={50} src={record.smallImage}/>,
+	  render:(_, record) => <Image width={50} src={record.goods_img}/>,
 	  hideInSearch: true
 	},
 	{
 	  title: '商品货号',
 	  valueType: 'text',
-	  dataIndex: 'goodsCode',
-	  render: (_, record) => record.goodsCode,
+	  dataIndex: 'goods_code',
 	  hideInSearch: true
 	},
 	{
 	   title: '库存',
-	   render: (_, record) => record?.stockLabel?.value,
+		 valueType: 'text',
+		 dataIndex: 'stock',
 	   hideInSearch: true
 	 },
 	{
 	  title: '唯品会价格',
 	  valueType: 'text',
+		dataIndex: 'vip_price',
+		render: (_, record) => (record.vip_price / 100).toFixed(2),
 	  hideInSearch: true,
-	  render: (_, record) => record?.price?.salePrice,
 	},
 	{
 	  title: '得物名称',
 	  valueType: 'text',
 	  hideInSearch: true,
 	  ellipsis: true,
-	  render: (_, record) => record?.dewuDetail?.title,
+		dataIndex: 'deiwu_name',
 	  width:200,
 	},
 	{
 	  title: '得物价格',
-	  dataIndex: 'dewuPrice',
+	  dataIndex: 'deiwu_price',
 	  valueType: 'text',
+	  render: (_, record) => (record.deiwu_price / 100).toFixed(2),
 	  hideInSearch: true
 	},
 	{
 	  title: '得物图片',
 	  valueType: 'text',
 	  hideInSearch: true,
-	  render:(_, record) => <Image width={50} src={record?.dewuDetail?.logoUrl}/>
+	  render:(_, record) => <Image width={50} src={record.deiwu_img}/>
 	},
 	{
 	  title: '得物货号',
 	  valueType: 'text',
+		dataIndex: 'deiwu_code',
 	  hideInSearch: true,
-	  render: (_, record) => record?.dewuDetail?.articleNumber,
 	},
 	
 	{
 	  title: '得物销量',
-	  dataIndex: 'soldNum',
+	  dataIndex: 'deiwu_sales',
 	  valueType: 'text',
 	  hideInSearch: true,
-	  sorter: (a, b) => a.soldNum - b.soldNum,
 	},
 	
 	{
 	  title: '差价',
-	  dataIndex: 'chajia',
+	  dataIndex: 'difference_price',
 	  valueType: 'text',
-	  sorter: (a, b) => a.chajia - b.chajia,
+	  render: (_, record) => (record.difference_price / 100).toFixed(2),
 	  hideInSearch: true
 	},
     {
@@ -151,8 +117,8 @@ const TableList = () => {
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
-		  <a href={`https://m.vip.com/product-${record.brandId}-${record.productId}.html`} target="_black">唯品会查看</a>,
-		  <a href={`https://m.poizon.com/router/product/ProductDetail?spuId=${record.dewuProductId}&sourceName=shareDetail`} target="_black">得物查看</a>
+		  <a href={`https://m.vip.com/product-${record.brand}-${record.vip_id}.html`} target="_black">唯品会查看</a>,
+		  <a href={`https://m.poizon.com/router/product/ProductDetail?spuId=${record.deiwu_id}&sourceName=shareDetail`} target="_black">得物查看</a>
       ],
 	  hideInSearch: true
     },
@@ -161,7 +127,6 @@ const TableList = () => {
   
   const getCode = async(code) => {
 	 const {data} = await getDetail({
-		 api_key: '8cec5243ade04ed3a02c5972bcda0d3f',
 		 productId: code
 	 });
 	 return data?.product?.merchandiseSn
@@ -173,7 +138,7 @@ const TableList = () => {
         headerTitle="唯品会商品列表"
         rowKey="goodsId"
 		pagination={{
-			pageSize: 80,
+			pageSize: 100,
 		}}
         search={{
           labelWidth: 120,
@@ -182,28 +147,15 @@ const TableList = () => {
 		onRow={onClickRow}
 		 rowClassName={setRowClassName}
         request={async (params, sorter, filter) => {
-			console.log(params, sorter, filter)
-			if(JSON.stringify(sorter) != sorters) {
-				setSorters(JSON.stringify(sorter));
-				return
-			};
-			
+
+			console.log(params)
 			const res = await getList({
 				brandId: params.brandId,
 				page: params.current,
+				size: params.pageSize,
 				categoryId: params.categoryId
 				
 			})
-			for(const obj of res.data){
-				obj.goodsCode = await getCode(obj.productId)
-				const res = await searchList(obj.goodsCode)
-				const detail = res?.data?.productList?.length? res?.data?.productList[0] : null;
-				obj.dewuPrice = detail? (detail.price / 100).toFixed(2) : null;
-				obj.soldNum = detail? detail.soldNum : null;
-				obj.dewuProductId = detail? detail.productId : null;
-				obj.chajia = detail? (parseInt(obj.dewuPrice) - parseInt(obj.price.salePrice)).toFixed(2) : null;
-				obj.dewuDetail = detail;
-			}
 			return {
 			   data: res.data,
 			   success: true,

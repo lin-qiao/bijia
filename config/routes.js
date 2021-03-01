@@ -50,10 +50,10 @@ export default [
                 ],
               },
               {
-                name: 'list.table-list',
+                name: 'list',
                 icon: 'table',
                 path: '/list',
-                component: './TableList',
+                component: './list',
               },
               {
                 component: './404',

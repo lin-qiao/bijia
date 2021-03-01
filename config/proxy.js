@@ -7,65 +7,12 @@
  */
 export default {
 	dev: {
-		'/myApi/': {
+		'/api/': {
 			target: 'http://localhost:3000',
 			changeOrigin: true,
 			pathRewrite: {
 				'^': '',
 			},
 		},
-		'/vip/': {
-			target: 'http://api.tbk.dingdanxia.com',
-			changeOrigin: true,
-			pathRewrite: {
-				'^': '',
-			},
-		},
-		'/shopping/': {
-			target: 'https://mapi.vip.com/vips-mobile/rest',
-			changeOrigin: true,
-			pathRewrite: {
-				'^': '',
-			},
-		},
-		'/shop/': {
-			target: 'https://mapi-rp.vip.com/vips-mobile/rest',
-			changeOrigin: true,
-			pathRewrite: {
-				'^': '',
-			},
-		},
-		'/products/': {
-			target: 'http://api.tanhuos.com',
-			changeOrigin: true,
-			pathRewrite: {
-				'^': '',
-			},
-		},
-		'/api/': {
-			target: 'https://app.poizon.com',
-			changeOrigin: true,
-			pathRewrite: {
-				'^': '',
-			},
-		}
-	},
-	test: {
-		'/vip/': {
-			target: 'http://api.tbk.dingdanxia.com',
-			changeOrigin: true,
-			pathRewrite: {
-				'^': '',
-			},
-		},
-	},
-	pre: {
-		'/api/': {
-			target: 'your pre url',
-			changeOrigin: true,
-			pathRewrite: {
-				'^': '',
-			},
-		},
-	},
+	}
 };
