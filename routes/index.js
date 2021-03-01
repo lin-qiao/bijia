@@ -1,6 +1,7 @@
 const router = require('koa-router')()
 const axios = require('axios');
 const getQueryStr = require('../util/getQuery');
+const { findAll } = require('../server/list');
 
 const getProduct = async (str) => {
 	return await axios.get('https://mapi-rp.vip.com/vips-mobile/rest/shopping/wxapp/product/module/list/v2', {
@@ -20,66 +21,17 @@ const getProduct = async (str) => {
 }
 router.get('/api/getList', async (ctx, next) => {
 	const {
-		brandId,
-		categoryId,
-		page
+		brandId = '100786243',
+		page = 1,
+		size = 100,
 	} = ctx.query;
-	const fromIndex = (page - 1) * 80 || 0;
-	console.log(fromIndex)
-	const {
-		data
-	} = await axios.get('https://mapi.vip.com/vips-mobile/rest/shopping/wap/product/list/rank/v2', {
-		params: {
-			'app_name': 'shop_wap',
-			'app_version': 4.0,
-			'api_key': '8cec5243ade04ed3a02c5972bcda0d3f',
-			'mobile_platform': 2,
-			'source_app': 'yd_wap',
-			'warehouse': 'VIP_SH',
-			'fdc_area_id': 103101101,
-			'province_id': 103101,
-			'mars_cid': '1611651641997_363f8de04dbfa0d2f495dfff4d0f8804',
-			'mobile_channel': 'mobiles-%7C%7C',
-			'standby_id': 'nature',
-			'brandId': brandId || 100786243,
-			'sort': 6,
-			categoryId,
-			'fromIndex': fromIndex,
-			'abtestId': 13100000,
-			'salePlatform': 2,
-			'wap_consumer': 'A1',
-			'marketChannel': 'nature',
-			'functions': 'mobileImage%2ClistImg%2CheadInfoV3Wx%2CfallingTag',
-			'isGetBrandInfo': 1,
-			'mvip': true,
-			'_': 1611651657,
-		},
-		headers: {
-			'Referer': 'https://m.vip.com'
-		}
-	})
-	
-	let list = data.data.products;
-	list = list.map(item => item.pid);
-	let newList = [];
 
-	if(list.length){
-		if(list.length <= 40){
-			const product = await getProduct(list.join())
-			newList = product.data.data.products
-		}else{
-			const fristProduct = await getProduct(list.slice(0, 40).join())
-			const lastProduct = await getProduct(list.slice(40).join())
-			newList = [].concat(fristProduct.data.data.products, lastProduct.data.data.products)
-		}
-	}
-	
-	const total = data.data.total;
+	const {count, rows } =  await findAll(brandId, page, size);
 	ctx.body = {
 		success: 200,
 		message: '成功',
-		total,
-		data: newList
+		total: count,
+		data: rows
 	}
 })
 
@@ -115,60 +67,6 @@ router.get('/api/getCategoryList', async (ctx, next) => {
 		success: 200,
 		message: '成功',
 		data: data.data.hotCategory
-	}
-})
-
-router.get('/api/getNumber', async (ctx, next) => {
-	const { productId } = ctx.query;
-	
-	const {
-		data
-	} = await axios.get('https://mapi.vip.com/vips-mobile/rest/shopping/wap/product/detail/v5', {
-		params: {
-			api_key: '8cec5243ade04ed3a02c5972bcda0d3f',
-			productId
-		},
-	})
-	
-	ctx.body = {
-		success: 200,
-		message: '成功',
-		data: data.data.product.merchandiseSn
-	}
-})
-
-
-router.get('/api/getDeiwu', async (ctx, next) => {
-	const { code } = ctx.query;
-	
-	
-	const queryStr = getQueryStr({
-	  title: code,
-	  page: 0,
-	  limit: 20,
-	  showHot: -1,
-	  sortType: 1,
-	  sortMode: 1,
-	  unionId: "",
-	});
-	const {data } = await axios.get('https://app.poizon.com/api/v1/h5/search/fire/search/list?' + queryStr, {
-	  headers:{
-		  'Host': 'app.poizon.com',
-		  'accept': '*/*',
-		  'content-type': 'application/x-www-form-urlencoded',
-		  'referer': 'https://servicewechat.com/wx3c12cdd0ae8b1a7b/117/page-frame.html',
-		  'appid': 'wxapp',
-		  'appversion': '4.4.0',
-		  'wxapp-login-token': '3f885cf3|5805b23362561089694d1976c3f2ea84|1843f86c|13d7302d',
-		  'accept-language': 'zh-cn',
-		  'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/7.0.12(0x17000c2f) NetType/WIFI Language/zh_CN'
-	  }
-	});
-	
-	ctx.body = {
-		success: 200,
-		message: '成功',
-		data: data.data.productList[0] || {}
 	}
 })
 

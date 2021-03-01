@@ -59,9 +59,6 @@ const getData = async () => {
 	
 }
 
-
-
-schedule.scheduleJob('2 * * * * *', () => { 
-	console.log(111)
+schedule.scheduleJob('* * 1 * * *', () => { 
 	getData()
 })
