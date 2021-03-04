@@ -21,7 +21,7 @@ const findAll = async function(brandId, page, size) {
 				sequelize.where(sequelize.col('goods_code'), sequelize.col('deiwu_code')),
 				{brand: brandId},
 				{deiwu_sales: {
-					[Op.gt]: 100
+					[Op.gt]: 500
 				}},
 				{difference_price: {
 					[Op.gt]: 5000
