@@ -55,6 +55,12 @@ export default [
                 path: '/list',
                 component: './list',
               },
+				{
+				  name: 'lis2t',
+				  icon: 'table',
+				  path: '/list2',
+				  component: './list2',
+				},
               {
                 component: './404',
               },
