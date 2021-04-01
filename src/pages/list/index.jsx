@@ -41,28 +41,32 @@ const TableList = () => {
 	  
     {
       title: '商品名称',
-			dataIndex: 'goods_name',
-      valueType: 'text',
-			hideInSearch: true,
-			ellipsis: true,
+		dataIndex: 'goods_name',
+		valueType: 'text',
+		hideInSearch: true,
+		ellipsis: true,
+		width: 150
     },
 	{
 	  title: '商品主图',
 	  valueType: 'text',
 	  render:(_, record) => <Image width={50} src={record.goods_img}/>,
-	  hideInSearch: true
+	  hideInSearch: true,
+	  width: 80
 	},
 	{
 	  title: '商品货号',
 	  valueType: 'text',
 	  dataIndex: 'goods_code',
-	  hideInSearch: true
+	  hideInSearch: true,
+	  width: 100
 	},
 	{
 	   title: '库存',
 		 valueType: 'text',
 		 dataIndex: 'stock',
-	   hideInSearch: true
+	   hideInSearch: true,
+	   width: 50
 	 },
 	{
 	  title: '唯品会价格',
@@ -70,6 +74,7 @@ const TableList = () => {
 		dataIndex: 'vip_price',
 		render: (_, record) => (record.vip_price / 100).toFixed(2),
 	  hideInSearch: true,
+	  width: 80
 	},
 	{
 	  title: '得物名称',
@@ -77,25 +82,29 @@ const TableList = () => {
 	  hideInSearch: true,
 	  ellipsis: true,
 		dataIndex: 'deiwu_name',
+		width: 150
 	},
 	{
 	  title: '得物价格',
 	  dataIndex: 'deiwu_price',
 	  valueType: 'text',
 	  render: (_, record) => (record.deiwu_price / 100).toFixed(2),
-	  hideInSearch: true
+	  hideInSearch: true,
+	  width: 80
 	},
 	{
 	  title: '得物图片',
 	  valueType: 'text',
 	  hideInSearch: true,
-	  render:(_, record) => <Image width={50} src={record.deiwu_img}/>
+	  render:(_, record) => <Image width={50} src={record.deiwu_img}/>,
+	  width: 50
 	},
 	{
 	  title: '得物货号',
 	  valueType: 'text',
 		dataIndex: 'deiwu_code',
 	  hideInSearch: true,
+	  width: 100
 	},
 	
 	{
@@ -103,6 +112,7 @@ const TableList = () => {
 	  dataIndex: 'deiwu_sales',
 	  valueType: 'text',
 	  hideInSearch: true,
+	  width: 80
 	},
 	
 	{
@@ -110,17 +120,19 @@ const TableList = () => {
 	  dataIndex: 'difference_price',
 	  valueType: 'text',
 	  render: (_, record) => (record.difference_price / 100).toFixed(2),
-	  hideInSearch: true
+	  hideInSearch: true,
+	  width: 80
 	},
     {
-      title: '',
+      title: '操作',
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
-		  <a href={`https://m.vip.com/product-${record.brand}-${record.vip_id}.html`} target="_black">唯品会查看</a>,
-		  <a href={`https://m.poizon.com/router/product/ProductDetail?spuId=${record.deiwu_id}&sourceName=shareDetail`} target="_black">得物查看</a>
+		  <a href={`https://m.vip.com/product-${record.brand}-${record.vip_id}.html`} target="_black">查看</a>,
+		  <a href={`https://m.poizon.com/router/product/ProductDetail?spuId=${record.deiwu_id}&sourceName=shareDetail`} target="_black">查看</a>
       ],
-	  hideInSearch: true
+	  hideInSearch: true,
+	  width: 100
     },
   ];
   
