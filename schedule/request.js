@@ -20,41 +20,35 @@ const getProduct = async (str) => {
 }
 
 const getList = async (brandId, page) => {
-	const fromIndex = page * 80 || 0;
+	const pageOffset = page * 120 || 0;
 	const {
 		data
-	} = await axios.get('https://mapi.vip.com/vips-mobile/rest/shopping/wap/product/list/rank/v2', {
+	} = await axios.get('https://mapi-rp.vip.com/vips-mobile/rest/product/brandstore/product/rank', {
 		params: {
-			'app_name': 'shop_wap',
-			'app_version': 4.0,
-			'api_key': '8cec5243ade04ed3a02c5972bcda0d3f',
-			'mobile_platform': 2,
-			'source_app': 'yd_wap',
-			'warehouse': 'VIP_SH',
-			'fdc_area_id': 103101101,
-			'province_id': 103101,
-			'mars_cid': '1611651641997_363f8de04dbfa0d2f495dfff4d0f8804',
-			'mobile_channel': 'mobiles-%7C%7C',
-			'standby_id': 'nature',
-			'brandId': brandId || 100786243,
-			'sort': 6,
-			'fromIndex': fromIndex,
-			'abtestId': 13100000,
-			'salePlatform': 2,
-			'wap_consumer': 'A1',
-			'marketChannel': 'nature',
-			'functions': 'mobileImage%2ClistImg%2CheadInfoV3Wx%2CfallingTag',
-			'isGetBrandInfo': 1,
-			'mvip': true,
-			'_': 1611651657,
+			app_name:'shop_wap',
+			app_version:'4.0',
+			api_key:'8cec5243ade04ed3a02c5972bcda0d3f',
+			mobile_platform:'2',
+			source_app:'yd_wap',
+			warehouse:'VIP_SH',
+			fdc_area_id:'103101101',
+			province_id:'103101',
+			mars_cid:'1616742667576_49e3f20f91449699814e14f9bcf539cc',
+			mobile_channel:'mobiles-||',
+			standby_id:'nature',
+			functions:'id2str',
+			sort:'',
+			brandStoreSn:brandId,
+			pageOffset,
+			mvip:true,
+			_:1617169598
 		},
 		headers: {
 			'Referer': 'https://m.vip.com'
 		}
 	})
 	
-	let list = data.data.products;
-	list = list.map(item => item.pid);
+	let list = data.data.productIds;
 	let newList = [];
 	
 	if(list.length){
@@ -63,8 +57,9 @@ const getList = async (brandId, page) => {
 			newList = product.data.data.products
 		}else{
 			const fristProduct = await getProduct(list.slice(0, 40).join())
-			const lastProduct = await getProduct(list.slice(40).join())
-			newList = [].concat(fristProduct.data.data.products, lastProduct.data.data.products)
+			const centerProduct = await getProduct(list.slice(40, 80).join()) 
+			const lastProduct = await getProduct(list.slice(80).join())
+			newList = [].concat(fristProduct.data.data.products, centerProduct.data.data.products, lastProduct.data.data.products)
 		}
 	}
 	return {

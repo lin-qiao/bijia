@@ -8,28 +8,28 @@ const {
 	getCategoryList
 } = require('./request');
 
-const brandList = ['100786243', '100722917', '100908165', '100926957', '100926915', '100926931'];
+
+const brandList = ['10000269', '10000652', '10000542', '10004114','10000721','10000630', '10006920'];
 
 const getData = async () => {
 	brandList.forEach(async item => {
 		const { total } = await getList(item, 0);
-		const categoryList = await getCategoryList(item);
+
 		for(let i= 0; i < Math.ceil(total / 80); i++){
 			let { list } = await getList(item, i);
 			for(const obj of list){
 				obj.goodsCode = await getNumber(obj.productId);
-				console.log(obj.goodsCode)
 				const data = await getDeiwu(obj.goodsCode)
 				obj.deiwuName = data? data.title : '';
 				obj.deiwuImg = data? data.logoUrl : '';
 				obj.deiwuPrice = data? data.price? data.price : 0 : 0;
-				obj.vipPrice = obj.price? obj.price.salePrice * 100 : 0;
+				obj.vipPrice = obj.price? obj.price.couponPrice? obj.price.couponPrice * 100 : obj.price.salePrice * 100 : 0;
 				obj.deiwuSales = data? data.soldNum : '';
 				obj.deiwuId = data? data.productId : '';
 				obj.deiwuCode = data? data.articleNumber : '';
 				obj.differencePrice =  obj.deiwuPrice - obj.vipPrice;
 				obj.brand = item;
-				obj.type = categoryList.filter(category => category.id == obj.categoryId)[0];
+				obj.type = null;
 				obj.stock = obj.stockLabel? obj.stockLabel.value : '';
 				
 			}
@@ -58,6 +58,9 @@ const getData = async () => {
 	})
 	
 }
+
+getData()
+
 
 schedule.scheduleJob('0 0 1 * * *', () => { 
 	getData()
