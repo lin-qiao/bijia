@@ -24,15 +24,17 @@ const TableList = () => {
 	  {
 	    title: '专场',
 	    dataIndex: 'brandId',
-		initialValue: '100786243',
+		initialValue: '10000269',
 	    valueType: 'select',
 	    valueEnum: {
-	      100786243: { text: '耐克', status: '100786243' },
-	      100722917: { text: '彪马', status: '100722917' },
-	      100908165: { text: '安踏', status: '100908165' },
-	      100926957: { text: '匡威', status: '100926957' },
-	      100926915: { text: '阿迪', status: '100926915' },
-	      100926931: { text: '李宁', status: '100926931' },
+			10000269: { text: '安踏', status: '10000269' },
+			10000652: { text: '匹克', status: '10000652' },
+			10000542: { text: '李宁', status: '10000542' },
+			10004114: { text: '斐乐', status: '10004114' },
+			10000721: { text: '斯凯奇', status: '10000721' },
+			10000630: { text: '耐克', status: '10000630' },
+			10006920: { text: '万斯', status: '10006920' },
+
 	    },
 		hideInTable: true
 	  },
@@ -43,7 +45,6 @@ const TableList = () => {
       valueType: 'text',
 			hideInSearch: true,
 			ellipsis: true,
-			width:200,
     },
 	{
 	  title: '商品主图',
@@ -76,7 +77,6 @@ const TableList = () => {
 	  hideInSearch: true,
 	  ellipsis: true,
 		dataIndex: 'deiwu_name',
-	  width:200,
 	},
 	{
 	  title: '得物价格',
